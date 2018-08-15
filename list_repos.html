@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>List Repository Contributors</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body style="font-family:Calibri;font-size:16px;">
+
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-sm-12" style="background-color:white;height:50px"></div>
+        </div>
+
+        <div class="row" style="vertical-align:bottom;">
+            <div class="col-sm-1" style="background-color:white;height:140px">
+                <img src="images/github_logo.png" style="width:80px;height:80px">
+            </div>
+            <div class="col-sm-11" style="background-color:white;height:100px;">
+                <div style="font-family:Calibri;font-size:32px;text-align:left;">
+                    <u><span id="name"></span></u>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+
+            <div class="col-xs-6 col-sm-3" style="background-color:white;">
+
+                Information <br>--------------------------<br>
+
+                Owner: <img src="images/github_logo.png" style="width:20px;height:20px"><span id="login" style="font-family:Calibri;font-size:12px"></span><br />
+                Forks: <span id="forks" style="font-family:Calibri;font-size:12px"></span><br />
+                Watchers: <span id="watchers" style="font-family:Calibri;font-size:12px"></span><br />
+                Language: <span id="language" style="font-family:Calibri;font-size:12px"></span><br />
+                Subscribers: <span id="subscribers" style="font-family:Calibri;font-size:12px"></span><br />
+
+
+            </div>
+            <!-- Add clearfix for only the required viewport -->
+            <div class="clearfix visible-xs"></div>
+
+            <div class="col-xs-6 col-sm-3" style="background-color:white;">
+                Contributors <br>--------------------------<br>
+
+                        <span id="contributor" style="font-family:Calibri;font-size:12px"></span>
+                                          
+                <br />
+
+
+            </div>
+            <!-- Add clearfix for only the required viewport -->
+            <div class="clearfix visible-xs"></div>
+
+            <div class="col-xs-6 col-sm-3" style="background-color:white;">
+                Open Issues <br>--------------------------<br>
+
+                <span id="issue" style="font-family:Calibri;font-size:12px"></span><br />
+
+            </div>
+            <!-- Add clearfix for only the required viewport -->
+            <div class="clearfix visible-xs"></div>
+
+            <div class="col-xs-6 col-sm-3" style="background-color:white;">
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
+    <script type="text/javascript">
+
+        // just receive user and repo => then build querystring
+
+        var followers_url = "";
+        url = window.location.search.substring(1);
+
+        var bigarr = url.split("&");
+        var userstr = bigarr[0];
+        var repostr = bigarr[1];
+
+        // user
+
+        var arr = userstr.split("=");
+        var str = arr[1];
+        var st = str.replace("%27", "");
+        var user = st.replace("%27", "");
+
+        // repo
+
+        var arr2 = repostr.split("=");
+        var str2 = arr2[1];
+        var st2 = str2.replace("%27", "");
+        var repo = st2.replace("%27", "");
+
+        // First query
+
+        var xhttp2 = new XMLHttpRequest();
+
+        xhttp2.onreadystatechange = function () {
+            if (xhttp2.readyState == 4 && xhttp2.status == 200) {
+
+
+                var obj2 = JSON.parse(xhttp2.responseText);
+
+                document.getElementById("name").innerHTML = obj2.name;
+                document.getElementById("login").innerHTML = obj2.owner.login;
+                document.getElementById("forks").innerHTML = obj2.forks;
+
+                document.getElementById("language").innerHTML = obj2.language;
+                document.getElementById("watchers").innerHTML = obj2.watchers;
+                document.getElementById("subscribers").innerHTML = obj2.subscribers_count;
+
+
+            }
+        };
+
+        var search = "https://api.github.com/repos/" + user + "/" + repo;
+        xhttp2.open("GET", search, true);
+        xhttp2.send();
+        
+
+        // Second query
+
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function follow() {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+
+
+                var obj = JSON.parse(xhttp.responseText);
+
+
+                var num;
+                for (num = 0; num < obj.length; num++) {
+
+                    document.getElementById("contributor").innerHTML += "<a href='list_repos3.html?url=" + obj[num].url + "' data-toggle='tooltip' title=' id: " + obj[num].id + "\n repositories: " + obj[num].repos_url + "\n followers: " + obj[num].followers_url + "' > " + obj[num].login + " </a><br>";
+                }
+
+            }
+        };
+
+        var search2 = "https://api.github.com/repos/" + user + "/" + repo + "/contributors";
+        xhttp.open("GET", search2, true);
+        xhttp.send();
+
+        // Third query
+
+        var xhttp3 = new XMLHttpRequest();
+
+        xhttp3.onreadystatechange = function events() {
+            if (xhttp3.readyState == 4 && xhttp3.status == 200) {
+
+
+                var obj3 = JSON.parse(xhttp3.responseText);
+
+
+                var num;
+                for (num = 0; num < obj3.length; num++) {
+
+                    document.getElementById("issue").innerHTML += "<a href='" + obj3[num].html_url + "' data-toggle='tooltip' title=' created: " + obj3[num].created_at + "\n user: " + obj3[num].user.login + "\n id: " + obj3[num].id + "' > " + obj3[num].title + " </a><br>";
+
+                }
+            }
+        };
+
+        var search3 = "https://api.github.com/repos/" + user + "/" + repo + "/issues?state=open";
+        xhttp3.open("GET", search3, true);
+        xhttp3.send();
+
+
+    </script>
+
+
+
+
+</body>
+
+</html>
+

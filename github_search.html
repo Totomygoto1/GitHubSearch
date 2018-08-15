@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <style>
+        #repo_total {
+            font-family: Calibri;
+            font-size: 14px;
+            color: darkgray;
+        }
+
+        #repo_title {
+            font-family: Calibri;
+            font-size: 16px;
+            color: dodgerblue;
+        }
+
+        #repo_fork {
+            font-family: Calibri;
+            font-size: 12px;
+            color: lightgrey;
+        }
+    </style>
+
+
+    <title>GitHub Repository search</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+    <form>
+
+        <div class="container-fluid" id="display_search_box_panel">
+
+            <div class="row">
+                <div class="col-sm-12" style="background-color:white;height:200px"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3" style="background-color:white;"></div>
+                <div class="col-sm-6" style="background-color:white;text-align:center;">
+                    <img src="images/github_logo.png" style="width:80px;height:80px">
+                </div>
+                <div class="col-sm-3" style="background-color:white;"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3" style="background-color:white;"></div>
+                <div class="col-sm-6" style="background-color:white;">
+                    <div style="font-family:Calibri;font-size:32px;text-align:center;">
+                        <strong> Search GitHub Repositories </strong>
+                    </div>
+                </div>
+                <div class="col-sm-3" style="background-color:white;"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3" style="background-color:white;"></div>
+                <div class="col-sm-4" style="background-color:white;">
+                    <div class="form-group">
+                        <input type="text" id="query" class="form-control input-lg" value="text" />
+                    </div>
+                </div>
+                <div class="col-sm-2" style="background-color:white;">
+                    <button type="button" onclick="loadDoc()" class="btn btn-default" style="background-color:lightgray;border: 1px solid darkgray;width:150px;height:45px">
+                        <div style="font-family:Calibri;font-size:14px">Search</div>
+                    </button>
+                </div>
+                <div class="col-sm-3" style="background-color:white;"></div>
+            </div>
+
+
+        </div>
+
+
+
+        <div class="container-fluid" id="display_all_search_results">
+
+
+            <div class="row">
+                <div class="col-sm-3" style="background-color:white;"></div>
+
+                <div class="col-sm-6" id="repo_total" style="background-color:white;text-align:left;">
+                </div>
+
+                <div class="col-sm-3" style="background-color:white;"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3" style="background-color:white;"></div>
+
+                <div class="col-sm-3" id="repo_title" style="background-color:white;text-align:left;">
+                </div>
+
+                <div class="col-sm-3" id="repo_fork" style="background-color:white;text-align:left;">
+                </div>
+
+                <div class="col-sm-3" style="background-color:white;"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12" style="background-color:white;height:40px"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3" style="background-color:white;"></div>
+
+                <div class="col-sm-6" id="repo_links" style="background-color:white;text-align:left;color:darkgrey;font-family:Calibri;font-size:12px">
+                </div>
+
+                <div class="col-sm-3" style="background-color:white;"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12" style="background-color:white;height:200px"></div>
+            </div>
+
+
+
+        </div>
+
+
+    </form>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script>
+
+
+
+        var page = "1";
+        url = window.location.search.substring(1);
+
+        ///////////////// an input-box search
+
+				
+				function loadDoc() {
+
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (xhttp.readyState == 4 && xhttp.status == 200) {
+
+
+                        var obj = JSON.parse(xhttp.responseText);
+
+                        // check for existing search elements - remove old search
+
+                        var list = document.getElementById("repo_total");
+                        while (list.hasChildNodes()) {
+                            list.removeChild(list.firstChild);
+                        }
+
+                        var list2 = document.getElementById("repo_title");
+                        while (list2.hasChildNodes()) {
+                            list2.removeChild(list2.firstChild);
+                        }
+
+                        var list3 = document.getElementById("repo_fork");
+                        while (list3.hasChildNodes()) {
+                            list3.removeChild(list3.firstChild);
+                        }
+
+                        var list4 = document.getElementById("repo_links");
+                        while (list4.hasChildNodes()) {
+                            list4.removeChild(list4.firstChild);
+                        }
+
+
+                        var total = obj.total_count;
+                        var para3 = document.createElement("P");
+                        var t3 = document.createTextNode("We've found " + total + " repository results for: '" + search + "' ( showing page 1 )");
+                        para3.appendChild(t3);
+                        document.body.appendChild(para3);
+                        document.getElementById("repo_total").appendChild(para3);
+
+                        var num;
+                        for (num = 0; num < total; num++) {
+
+                            var x = document.createElement("a");
+
+                            var link = "list_repos.html?user=" + obj.items[num].owner.login + "&repo=" + obj.items[num].name;
+
+                            x.setAttribute("href", link);
+                            x.setAttribute("style", "color:dodgerblue;font-family:Calibri;font-size:16px");
+
+                            var y = document.createTextNode(obj.items[num].full_name);
+
+                            x.appendChild(y);
+                            document.getElementById("repo_title").appendChild(x);
+
+                            ///
+
+                            var z = document.createElement("br");
+                            document.getElementById("repo_title").appendChild(z);
+
+                            ///
+
+                            var a = document.createElement("span");
+
+                            a.setAttribute("style", "color:darkgrey;font-family:Calibri;font-size:12px");
+
+                            var b = document.createTextNode(obj.items[num].updated_at);
+
+                            a.appendChild(b);
+                            document.getElementById("repo_title").appendChild(a);
+
+                            var z = document.createElement("br");
+                            document.getElementById("repo_title").appendChild(z);
+
+                            ///
+
+                            var a = document.createElement("span");
+
+                            a.setAttribute("style", "color:darkgrey;font-family:Calibri;font-size:12px");
+
+                            var b = document.createTextNode(obj.items[num].language + " " + obj.items[num].stargazers_count + " " + obj.items[num].forks);
+
+                            a.appendChild(b);
+                            document.getElementById("repo_fork").appendChild(a);
+
+                            ///
+
+                            var z = document.createElement("br");
+                            document.getElementById("repo_fork").appendChild(z);
+
+                            var z = document.createElement("p");
+                            var a = document.createTextNode(" ---- ");
+                            z.appendChild(a);
+                            document.getElementById("repo_fork").appendChild(z);
+
+                            if (num == 29) {
+                                document.getElementById("repo_links").innerHTML += "<p>Next search results: </p>";
+
+                                var tot_page_links = total / 30;
+                                for (i = 0; i < tot_page_links; i++) {
+                                    j = i + 1;
+
+                                    document.getElementById("repo_links").innerHTML += "<a href='github_search.html?q=" + search + "&sort=stars&order=desc&page=" + j + "'> " + j + " </a>";
+
+                                }
+                            }
+
+
+                        }
+
+						
+						
+						
+                    }
+					
+					
+					
+                };
+
+                var search = $("#query").val();
+
+                xhttp.open("GET", "https://api.github.com/search/repositories?q=" + search + "&sort=stars&order=desc&page=1", true);
+
+                xhttp.send();
+				
+				}
+
+
+        ///////////////// a link - paging (30 objects)
+
+        if (url.length > 5) {
+
+            var bigarr = url.split("&");
+            var pagestr = bigarr[3];
+            var searchstr = bigarr[0];
+
+            // page
+
+            var arr = pagestr.split("=");
+            var page = arr[1];
+
+            // search
+
+            var arr2 = searchstr.split("=");
+            var search = arr2[1];
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+
+
+                    var obj = JSON.parse(xhttp.responseText);
+
+                    var total = obj.total_count;
+                    var para3 = document.createElement("P");
+                    var t3 = document.createTextNode("We've found " + total + " repository results for: '" + search + "' ( showing page " + page + " )");
+                    para3.appendChild(t3);
+                    document.body.appendChild(para3);
+                    document.getElementById("repo_total").appendChild(para3);
+
+                    var num;
+                    for (num = 0; num < total; num++) {
+
+                        var x = document.createElement("a");
+
+                        var link = "list_repos.html?user=" + obj.items[num].owner.login + "&repo=" + obj.items[num].name;
+
+                        x.setAttribute("href", link);
+                        x.setAttribute("style", "color:dodgerblue;font-family:Calibri;font-size:16px");
+
+                        var y = document.createTextNode(obj.items[num].full_name);
+
+                        x.appendChild(y);
+                        document.getElementById("repo_title").appendChild(x);
+
+                        ///
+
+                        var z = document.createElement("br");
+                        document.getElementById("repo_title").appendChild(z);
+
+                        ///
+
+                        var a = document.createElement("span");
+
+                        a.setAttribute("style", "color:darkgrey;font-family:Calibri;font-size:12px");
+
+                        var b = document.createTextNode(obj.items[num].updated_at);
+
+                        a.appendChild(b);
+                        document.getElementById("repo_title").appendChild(a);
+
+                        var z = document.createElement("br");
+                        document.getElementById("repo_title").appendChild(z);
+
+                        ///
+
+                        var a = document.createElement("span");
+
+                        a.setAttribute("style", "color:darkgrey;font-family:Calibri;font-size:12px");
+
+                        var b = document.createTextNode(obj.items[num].language + " " + obj.items[num].stargazers_count + " " + obj.items[num].forks);
+
+                        a.appendChild(b);
+                        document.getElementById("repo_fork").appendChild(a);
+
+                        ///
+
+                        var z = document.createElement("br");
+                        document.getElementById("repo_fork").appendChild(z);
+
+                        var z = document.createElement("p");
+                        var a = document.createTextNode(" ---- ");
+                        z.appendChild(a);
+                        document.getElementById("repo_fork").appendChild(z);
+
+                        if (num == 29) {
+                            document.getElementById("repo_links").innerHTML += "<p>Next search results: </p>";
+
+                            var tot_page_links = total / 30;
+                            for (i = 0; i < tot_page_links; i++) {
+                                j = i + 1;
+
+                                document.getElementById("repo_links").innerHTML += "<a href='github_search.html?q=" + search + "&sort=stars&order=desc&page=" + j + "'> " + j + " </a>";
+
+                            }
+                        }
+
+                    }
+
+                }
+            };
+
+            xhttp.open("GET", "https://api.github.com/search/repositories?q=" + search + "&sort=stars&order=desc&page=" + page, true);
+
+            xhttp.send();
+
+        }
+
+    </script>
+
+</body>
+</html>
+
+
+

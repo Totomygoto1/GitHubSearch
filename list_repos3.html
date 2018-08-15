@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-sm-12" style="background-color:white;height:200px"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3" style="background-color:white;"></div>
+            <div class="col-sm-6" style="background-color:white;text-align:center;">
+                <img src="images/github_logo.png" style="width:80px;height:80px" /><p></p>
+            </div>
+            <div class="col-sm-3" style="background-color:white;"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3" style="background-color:white;"></div>
+            <div class="col-sm-6" style="background-color:white;text-align:center;">                
+                <span id="user_image" style="font-family:Calibri;font-size:12px"></span> 
+                <p></p>
+                <span id="user_details" style="font-family:Calibri;font-size:12px"></span> 
+            </div>
+            <div class="col-sm-3" style="background-color:white;"></div>
+        </div>
+
+    </div>
+
+
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
+        <script>
+
+            // just send url => then get user object
+            var url = "";
+            url = window.location.search.substring(1);
+
+            var arr = url.split("=");
+            var search4 = arr[1];
+
+            // Ask for Follower User object - more Info - onmouseover
+
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function follow() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+
+                    var obj = JSON.parse(xhttp.responseText);
+
+                    document.getElementById("user_image").innerHTML += " <br><img src='" + obj.avatar_url + "' style='width:200px;height:200px' />";
+                    document.getElementById("user_details").innerHTML += " <br>Name: " + obj.name + " <br>Location: " + obj.location + " <br>Email: " + obj.email;
+
+                }
+            };
+
+            xhttp.open("GET", search4, true);
+            xhttp.send();
+
+
+        </script>
+
+
+
+</body>
+</html>
